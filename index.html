@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Le mercadito de Guillaume</title>
+<meta name="description" content="Départ pour le Mexique : meubles, jeux et petits objets à prendre. Mets dans le cabas, réserve, vire.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Karla:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #F2E9DC;
+    --card: #FDF9F1;
+    --ink: #2E4538;
+    --muted: #566659;
+    --green: #3E7C59;
+    --green-ink: #FDF9F1;
+    --red: #B33A3A;
+    --kraft: #D9C7A3;
+    --kraft-ink: #4A3B22;
+    --line: #E1D5BF;
+    --photo-a: #E7DCC8;
+    --photo-b: #DFD2BA;
+    --photo-ink: #8A7B5E;
+    --shadow: 0 2px 10px rgba(46, 69, 56, .14);
+    --display: 'Bricolage Grotesque', 'Avenir Next', system-ui, sans-serif;
+    --body: Karla, system-ui, -apple-system, sans-serif;
+    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151E18;
+      --card: #1F2B23;
+      --ink: #EDE6D6;
+      --muted: #A3B0A5;
+      --green: #5FAE80;
+      --green-ink: #0F1F14;
+      --red: #E5786F;
+      --kraft: #CDB98F;
+      --kraft-ink: #3A2E16;
+      --line: #2E3D33;
+      --photo-a: #29372E;
+      --photo-b: #243128;
+      --photo-ink: #7F8F82;
+      --shadow: 0 2px 10px rgba(0, 0, 0, .45);
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.45;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  a { color: var(--green); }
+  :focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* ---------- en-tête ---------- */
+  .picado {
+    height: 16px;
+    background:
+      conic-gradient(from 135deg at 50% 0, var(--green) 90deg, transparent 0) 0 0 / 32px 16px repeat-x,
+      conic-gradient(from 135deg at 50% 0, var(--red) 90deg, transparent 0) 16px 0 / 32px 16px repeat-x;
+    opacity: .9;
+    margin-top: env(safe-area-inset-top, 0px);
+  }
+  .hero { padding-top: 28px; padding-bottom: 8px; }
+  .kicker {
+    margin: 0 0 6px;
+    font-weight: 700; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--red);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--display); font-weight: 800;
+    font-size: clamp(2rem, 7vw, 3.4rem); line-height: 1.02; letter-spacing: -.02em;
+    text-wrap: balance;
+  }
+  .lede { margin: 12px 0 0; max-width: 56ch; font-size: 1.08rem; color: var(--muted); }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 16px 0 0; padding: 0; list-style: none; font-weight: 500; font-size: .95rem; }
+  .steps li::before { content: "→ "; color: var(--green); font-weight: 700; }
+  .ticket-link {
+    margin-top: 14px; background: none; border: 0; padding: 0;
+    color: var(--green); font-weight: 700; text-decoration: underline; text-underline-offset: 3px;
+  }
+
+  /* ---------- outils ---------- */
+  .tools { display: grid; gap: 12px; margin-top: 22px; }
+  .tools-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .field {
+    width: 100%;
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 11px 14px; min-height: 46px; font-size: 16px;
+  }
+  .field:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 28%, transparent); }
+  #q { flex: 1 1 220px; min-width: 0; }
+  #sort { flex: 1 1 180px; min-width: 0; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; scrollbar-width: thin; }
+  .chip {
+    flex: 0 0 auto; white-space: nowrap;
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 999px;
+    padding: 8px 14px; font-weight: 500; font-size: .92rem; min-height: 40px;
+  }
+  .chip[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: var(--green-ink); font-weight: 700; }
+  .count { margin: 6px 0 14px; color: var(--muted); font-size: .92rem; }
+
+  /* ---------- grille ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  @media (min-width: 700px) { .grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; } }
+  .merc { position: relative; display: flex; flex-direction: column; background: var(--card); border-radius: 16px; box-shadow: var(--shadow); min-width: 0; }
+  .photo-btn { display: block; padding: 0; border: 0; background: none; width: 100%; border-radius: 16px 16px 0 0; overflow: hidden; }
+  .photo {
+    position: relative; aspect-ratio: 4 / 3; width: 100%;
+    background: repeating-linear-gradient(45deg, var(--photo-a) 0 14px, var(--photo-b) 14px 28px);
+    display: grid; place-items: center;
+    color: var(--photo-ink); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase;
+  }
+  .photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .media { position: relative; }
+  .tag {
+    position: absolute; right: 10px; bottom: -14px;
+    background: var(--kraft); color: var(--kraft-ink);
+    font-family: var(--display); font-weight: 800; font-size: 1.02rem; line-height: 1;
+    padding: 8px 12px 8px 14px; border-radius: 4px 10px 10px 10px;
+    transform: rotate(3deg); box-shadow: 0 2px 5px rgba(0, 0, 0, .22);
+    pointer-events: none; z-index: 2;
+  }
+  .tag::before { content: ""; position: absolute; top: 50%; left: 4px; width: 5px; height: 5px; margin-top: -2.5px; border: 1.5px solid var(--kraft-ink); border-radius: 50%; background: var(--card); }
+  .tag.small { font-size: .78rem; }
+  .merc .body { padding: 26px 14px 4px; display: grid; gap: 3px; flex: 1; align-content: start; }
+  .cat { font-size: .7rem; font-weight: 700; color: var(--red); letter-spacing: .07em; text-transform: uppercase; }
+  .name-btn { background: none; border: 0; padding: 0; text-align: left; font-family: var(--display); font-weight: 700; font-size: 1.05rem; line-height: 1.2; text-wrap: balance; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--green); color: var(--green-ink); border: 2px solid var(--green);
+    border-radius: 999px; padding: 10px 16px; min-height: 46px;
+    font-weight: 700; font-size: .95rem; text-align: center;
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn.ghost { background: transparent; color: var(--green); }
+  .btn.block { width: 100%; }
+  .btn[disabled] { opacity: .55; cursor: not-allowed; filter: none; }
+  .merc .btn { margin: 12px 12px 14px; padding: 10px 8px; font-size: .88rem; }
+  .merc .gone { margin: 12px 14px 16px; text-align: center; color: var(--muted); font-weight: 700; font-size: .92rem; }
+  .merc.off .photo, .merc.off .body { opacity: .5; }
+  .sticker {
+    position: absolute; left: 50%; top: 50%; z-index: 3;
+    transform: translate(-50%, -50%) rotate(-8deg);
+    width: 88px; height: 88px; border-radius: 50%;
+    display: grid; place-items: center; text-align: center;
+    background: var(--red); color: #FDF9F1;
+    font-family: var(--display); font-weight: 800; font-size: .98rem; line-height: 1.05;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .3); pointer-events: none;
+  }
+  .sticker.sold { background: #2E4538; }
+  @media (prefers-color-scheme: dark) { .sticker.sold { background: #4B6B58; } }
+  .empty { grid-column: 1 / -1; text-align: center; padding: 40px 16px; color: var(--muted); }
+
+  /* ---------- barre du cabas ---------- */
+  .cabas-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    pointer-events: none;
+  }
+  .cabas-bar[hidden] { display: none; }
+  .cabas-bar button {
+    pointer-events: auto; display: flex; width: min(560px, 100%); margin: 0 auto;
+    align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--ink); color: var(--bg); border: 0; border-radius: 16px;
+    padding: 14px 18px; min-height: 56px; font-weight: 700; box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+  }
+  .cabas-bar .total { font-family: var(--display); font-weight: 800; font-size: 1.05rem; white-space: nowrap; }
+
+  /* ---------- fenêtres ---------- */
+  dialog {
+    border: 0; padding: 0; background: var(--card); color: var(--ink);
+    width: min(560px, calc(100vw - 24px)); max-height: min(90vh, calc(100dvh - 24px));
+    border-radius: 22px; overflow: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, .4);
+  }
+  dialog::backdrop { background: rgba(10, 18, 13, .55); }
+  @media (max-width: 600px) {
+    dialog { margin: auto 0 0; width: 100%; max-width: 100%; max-height: 92dvh; border-radius: 22px 22px 0 0; }
+  }
+  .sheet { padding: 0 20px calc(22px + env(safe-area-inset-bottom, 0px)); }
+  .sheet-head {
+    position: sticky; top: 0; z-index: 5; background: var(--card);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 0 10px;
+  }
+  .sheet-head h2 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.4rem; }
+  .x { background: var(--bg); border: 0; width: 42px; height: 42px; border-radius: 50%; font-size: 1.3rem; line-height: 1; }
+  .main-photo { aspect-ratio: 4 / 3; border-radius: 14px; overflow: hidden; }
+  .thumbs { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; }
+  .thumbs button { flex: 0 0 64px; height: 64px; padding: 0; border: 2px solid transparent; border-radius: 10px; overflow: hidden; background: none; }
+  .thumbs button[aria-current="true"] { border-color: var(--green); }
+  .thumbs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .detail-price { font-family: var(--display); font-weight: 800; font-size: 1.6rem; margin: 14px 0 2px; }
+  .detail-desc { margin: 8px 0 0; white-space: pre-line; }
+  .detail-actions { display: grid; gap: 10px; margin-top: 18px; }
+
+  .lines { list-style: none; margin: 4px 0 0; padding: 0; }
+  .lines li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+  .lines .l-name { flex: 1; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+  .lines .l-price { font-family: var(--display); font-weight: 700; white-space: nowrap; }
+  .lines .l-rm { background: none; border: 0; color: var(--red); font-weight: 700; padding: 8px; min-height: 40px; }
+  .sum { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 0 4px; font-weight: 700; }
+  .sum strong { font-family: var(--display); font-size: 1.5rem; font-weight: 800; }
+  .note { color: var(--muted); font-size: .9rem; margin: 4px 0 0; }
+  form .row { display: grid; gap: 6px; margin-top: 14px; }
+  form label { font-weight: 700; font-size: .92rem; }
+  form textarea.field { min-height: 76px; resize: vertical; }
+  .trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .alert { background: color-mix(in srgb, var(--red) 14%, var(--card)); border: 1.5px solid var(--red); border-radius: 12px; padding: 10px 14px; margin-top: 14px; font-size: .95rem; }
+
+  /* ---------- ticket de caisse ---------- */
+  .receipt {
+    position: relative; background: #FFFDF7; color: #2A2A26; font-family: var(--mono); font-size: .88rem;
+    padding: 22px 18px 30px; margin-top: 4px; border-radius: 6px 6px 0 0;
+    --zig: conic-gradient(from -45deg at bottom, transparent, #000 1deg 89deg, transparent 90deg) bottom / 16px 9px repeat-x;
+    -webkit-mask: var(--zig), linear-gradient(#000 0 0) top / 100% calc(100% - 8px) no-repeat;
+    mask: var(--zig), linear-gradient(#000 0 0) top / 100% calc(100% - 8px) no-repeat;
+  }
+  .receipt h3 { margin: 0; text-align: center; font-family: var(--display); font-weight: 800; font-size: 1.15rem; letter-spacing: .04em; text-transform: uppercase; }
+  .receipt .sub { text-align: center; color: #6C6A60; margin: 4px 0 14px; }
+  .receipt hr { border: 0; border-top: 1.5px dashed #B9B39F; margin: 12px 0; }
+  .receipt .r-line { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
+  .receipt .r-line span:first-child { overflow-wrap: anywhere; }
+  .receipt .r-total { font-weight: 700; font-size: 1.05rem; }
+  .receipt .pay-label { color: #6C6A60; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; margin-top: 12px; }
+  .receipt .pay-val { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 700; font-size: 1rem; overflow-wrap: anywhere; }
+  .receipt .code { font-size: 1.5rem; letter-spacing: .06em; }
+  .copy { flex: none; background: #2E4538; color: #FFFDF7; border: 0; border-radius: 8px; padding: 8px 12px; font-family: var(--body); font-weight: 700; font-size: .8rem; min-height: 38px; }
+  .receipt .thanks { text-align: center; margin: 14px 0 0; font-family: var(--body); font-size: .92rem; line-height: 1.4; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); z-index: 100;
+    transform: translateX(-50%); max-width: calc(100vw - 32px);
+    background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: .95rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+  }
+  .foot { text-align: center; color: var(--muted); font-size: .85rem; padding: 36px 0 8px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .merc { transition: transform .15s ease; }
+    .merc:hover { transform: translateY(-2px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="picado" aria-hidden="true"></div>
+
+<header class="wrap hero">
+  <p class="kicker">Départ pour le Mexique</p>
+  <h1>Le mercadito de Guillaume</h1>
+  <p class="lede">Tout doit partir avant le grand voyage. Servez-vous, mettez dans le cabas, et on s'arrange pour la remise.</p>
+  <ul class="steps">
+    <li>Choisis dans le cabas</li>
+    <li>Réserve en un clic</li>
+    <li>Vire sur mon compte</li>
+  </ul>
+  <button class="ticket-link" id="lastTicket" type="button" hidden>Revoir mon dernier ticket</button>
+</header>
+
+<main class="wrap">
+  <div class="tools">
+    <div class="tools-row">
+      <label class="sr" for="q">Rechercher un article</label>
+      <input id="q" class="field" type="search" placeholder="Rechercher (vélo, jeu, chaise...)" autocomplete="off">
+      <label class="sr" for="sort">Trier</label>
+      <select id="sort" class="field">
+        <option value="cat">Par catégorie</option>
+        <option value="recent">Nouveautés</option>
+        <option value="asc">Prix croissant</option>
+        <option value="desc">Prix décroissant</option>
+        <option value="nom">Nom, A à Z</option>
+      </select>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Catégories"></div>
+  </div>
+  <p class="count" id="count" aria-live="polite">Chargement du mercadito...</p>
+  <section class="grid" id="grid" aria-label="Articles"></section>
+  <p class="foot">Pas de carte bancaire : une fois ton cabas réservé, tu reçois un ticket avec le virement à faire.</p>
+</main>
+
+<div class="cabas-bar" id="bar" hidden>
+  <button type="button" id="openCabas">
+    <span id="barLabel">Mon cabas</span>
+    <span class="total" id="barTotal"></span>
+  </button>
+</div>
+
+<dialog id="detail" aria-labelledby="detailTitle"></dialog>
+<dialog id="cabas" aria-labelledby="cabasTitle"></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+'use strict';
+const API = 'https://ggwtoqtwstdjzhkntvai.supabase.co/functions/v1/boutique';
+const KEY_CART = 'mercadito:cabas';
+const KEY_TICKET = 'mercadito:ticket';
+const STATUS_LABEL = { reserve: 'Réservé !', paye: 'Vendu !', remis: 'Vendu !' };
+
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const $ = (id) => document.getElementById(id);
+const eur = new Intl.NumberFormat('fr-BE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const fmt = (n) => eur.format(n);
+const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+function el(tag, props, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid == null || kid === false) continue;
+    n.append(kid.nodeType ? kid : document.createTextNode(kid));
+  }
+  return n;
+}
+
+let items = [];
+let cart = new Set(store.get(KEY_CART) || []);
+const ui = { q: '', cat: 'Tout', sort: 'cat' };
+
+function saveCart() { store.set(KEY_CART, [...cart]); }
+function itemById(id) { return items.find((i) => i.id === id); }
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 3600);
+}
+
+// ---------- données ----------
+async function load(silent) {
+  try {
+    const res = await fetch(API + '/items', { cache: 'no-store' });
+    const data = await res.json();
+    if (!data.ok) throw new Error('api');
+    items = data.items;
+    const before = cart.size;
+    for (const id of [...cart]) {
+      const it = itemById(id);
+      if (!it || it.statut !== 'dispo') cart.delete(id);
+    }
+    if (cart.size !== before) {
+      saveCart();
+      if (silent) toast('Un article de ton cabas vient d\'être pris par quelqu\'un d\'autre.');
+    }
+    render();
+  } catch {
+    if (!silent) $('count').textContent = 'Impossible de charger le mercadito. Recharge la page dans un instant.';
+  }
+}
+
+// ---------- affichage de la grille ----------
+function visibleItems() {
+  const q = norm(ui.q);
+  let list = items.filter((i) =>
+    (ui.cat === 'Tout' || i.categorie === ui.cat) &&
+    (!q || norm(i.nom + ' ' + i.description + ' ' + i.categorie).includes(q)));
+  const price = (i) => (i.prix == null ? Infinity : Number(i.prix));
+  const cmp = {
+    cat: (a, b) => a.categorie.localeCompare(b.categorie, 'fr') || a.nom.localeCompare(b.nom, 'fr'),
+    recent: (a, b) => b.created_at.localeCompare(a.created_at) || a.nom.localeCompare(b.nom, 'fr'),
+    asc: (a, b) => price(a) - price(b),
+    desc: (a, b) => (price(b) === Infinity ? -1 : price(a) === Infinity ? 1 : price(b) - price(a)),
+    nom: (a, b) => a.nom.localeCompare(b.nom, 'fr'),
+  }[ui.sort];
+  list = list.slice().sort(cmp);
+  return [...list.filter((i) => i.statut === 'dispo'), ...list.filter((i) => i.statut !== 'dispo')];
+}
+
+function renderChips() {
+  const cats = [...new Set(items.map((i) => i.categorie))].sort((a, b) => a.localeCompare(b, 'fr'));
+  const box = $('chips');
+  box.replaceChildren(...['Tout', ...cats].map((c) => {
+    const n = c === 'Tout' ? items.filter((i) => i.statut === 'dispo').length : items.filter((i) => i.categorie === c && i.statut === 'dispo').length;
+    return el('button', {
+      class: 'chip', type: 'button', 'aria-pressed': String(ui.cat === c),
+      onclick: () => { ui.cat = c; render(); },
+    }, c + ' (' + n + ')');
+  }));
+}
+
+function photoBlock(it) {
+  const photo = el('div', { class: 'photo' });
+  if (it.photos && it.photos[0]) photo.append(el('img', { src: it.photos[0], alt: '', loading: 'lazy', decoding: 'async' }));
+  else photo.append('Photo à venir');
+  return photo;
+}
+
+function priceTag(it) {
+  return el('span', { class: 'tag' + (it.prix == null ? ' small' : '') }, it.prix == null ? 'Prix à discuter' : fmt(it.prix));
+}
+
+function card(it) {
+  const available = it.statut === 'dispo';
+  const inCart = cart.has(it.id);
+  const photoBtn = el('button', { class: 'photo-btn', type: 'button', 'aria-label': 'Voir ' + it.nom, onclick: () => openDetail(it.id) }, photoBlock(it));
+  const body = el('div', { class: 'body' },
+    el('span', { class: 'cat' }, it.categorie),
+    el('button', { class: 'name-btn', type: 'button', onclick: () => openDetail(it.id) }, it.nom));
+  const foot = available
+    ? el('button', {
+        class: 'btn' + (inCart ? ' ghost' : ''), type: 'button', 'aria-pressed': String(inCart),
+        onclick: () => toggle(it.id),
+      }, inCart ? 'Dans le cabas · Retirer' : 'Ajouter au cabas')
+    : el('p', { class: 'gone' }, it.statut === 'reserve' ? 'Déjà réservé' : 'Déjà vendu');
+  const media = el('div', { class: 'media' }, photoBtn, priceTag(it),
+    available ? null : el('span', { class: 'sticker' + (it.statut === 'reserve' ? '' : ' sold') }, STATUS_LABEL[it.statut] || 'Pris'));
+  return el('article', { class: 'merc' + (available ? '' : ' off') }, media, body, foot);
+}
+
+function render() {
+  renderChips();
+  const list = visibleItems();
+  const free = items.filter((i) => i.statut === 'dispo').length;
+  $('count').textContent = items.length
+    ? free + ' article' + (free > 1 ? 's' : '') + ' encore disponible' + (free > 1 ? 's' : '') + ' sur ' + items.length
+    : 'Le mercadito est vide pour le moment.';
+  $('grid').replaceChildren(...(list.length ? list.map(card) : [el('p', { class: 'empty' }, 'Rien ne correspond à ta recherche.')]));
+  renderBar();
+  refreshOpenDialogs();
+}
+
+function cartTotals() {
+  let total = 0, unpriced = 0;
+  for (const id of cart) {
+    const it = itemById(id);
+    if (!it) continue;
+    if (it.prix == null) unpriced++; else total += Number(it.prix);
+  }
+  return { total, unpriced };
+}
+
+function renderBar() {
+  const n = cart.size;
+  $('bar').hidden = n === 0;
+  if (!n) return;
+  const { total, unpriced } = cartTotals();
+  $('barLabel').textContent = 'Mon cabas (' + n + ')';
+  $('barTotal').textContent = total === 0 && unpriced ? 'Prix à discuter' : fmt(total) + (unpriced ? ' + à discuter' : '');
+}
+
+function toggle(id) {
+  if (cart.has(id)) cart.delete(id); else cart.add(id);
+  saveCart();
+  render();
+}
+
+// ---------- fiche article ----------
+let detailId = null;
+function openDetail(id) {
+  detailId = id;
+  drawDetail(0);
+  const d = $('detail');
+  if (!d.open) d.showModal();
+}
+
+function drawDetail(photoIndex) {
+  const it = itemById(detailId);
+  const d = $('detail');
+  if (!it) { d.close(); return; }
+  const photos = it.photos || [];
+  const available = it.statut === 'dispo';
+  const inCart = cart.has(it.id);
+  const main = el('div', { class: 'main-photo' }, photoBlock({ photos: photos[photoIndex] ? [photos[photoIndex]] : [] }));
+  main.firstChild.style.height = '100%'; main.firstChild.style.aspectRatio = 'auto';
+  const thumbs = photos.length > 1
+    ? el('div', { class: 'thumbs' }, photos.map((p, i) =>
+        el('button', { type: 'button', 'aria-label': 'Photo ' + (i + 1), 'aria-current': String(i === photoIndex), onclick: () => drawDetail(i) },
+          el('img', { src: p, alt: '' }))))
+    : null;
+  const link = it.lien_externe && /^https?:\/\//i.test(it.lien_externe)
+    ? el('p', { class: 'note' }, el('a', { href: it.lien_externe, target: '_blank', rel: 'noopener noreferrer' }, 'Voir le produit d\'origine'))
+    : null;
+  d.replaceChildren(el('div', { class: 'sheet' },
+    el('div', { class: 'sheet-head' },
+      el('h2', { id: 'detailTitle' }, it.nom),
+      el('button', { class: 'x', type: 'button', 'aria-label': 'Fermer', onclick: () => d.close() }, '×')),
+    main, thumbs,
+    el('p', { class: 'detail-price' }, it.prix == null ? 'Prix à discuter' : fmt(it.prix)),
+    el('p', { class: 'cat' }, it.categorie + (available ? '' : ' · ' + (it.statut === 'reserve' ? 'déjà réservé' : 'déjà vendu'))),
+    it.description ? el('p', { class: 'detail-desc' }, it.description) : null,
+    link,
+    available
+      ? el('div', { class: 'detail-actions' },
+          el('button', { class: 'btn block' + (inCart ? ' ghost' : ''), type: 'button', onclick: () => toggle(it.id) }, inCart ? 'Retirer du cabas' : 'Ajouter au cabas'),
+          inCart ? el('button', { class: 'btn block', type: 'button', onclick: () => { d.close(); openCabas(); } }, 'Voir mon cabas') : null)
+      : null));
+}
+
+// ---------- cabas et commande ----------
+function openCabas() {
+  drawCabas();
+  const d = $('cabas');
+  if (!d.open) d.showModal();
+}
+
+function drawCabas(errorMsg) {
+  const d = $('cabas');
+  const ids = [...cart].filter((id) => itemById(id));
+  if (!ids.length) {
+    d.replaceChildren(el('div', { class: 'sheet' },
+      sheetHead('Mon cabas', d),
+      el('p', null, 'Ton cabas est vide pour le moment.'),
+      el('button', { class: 'btn block', type: 'button', onclick: () => d.close() }, 'Continuer mes courses')));
+    return;
+  }
+  const { total, unpriced } = cartTotals();
+  const lines = el('ul', { class: 'lines' }, ids.map((id) => {
+    const it = itemById(id);
+    return el('li', null,
+      el('span', { class: 'l-name' }, it.nom),
+      el('span', { class: 'l-price' }, it.prix == null ? 'à discuter' : fmt(it.prix)),
+      el('button', { class: 'l-rm', type: 'button', 'aria-label': 'Retirer ' + it.nom, onclick: () => { cart.delete(id); saveCart(); render(); } }, 'Retirer'));
+  }));
+  const form = el('form', { id: 'orderForm', novalidate: true },
+    el('div', { class: 'row' }, el('label', { for: 'f-nom' }, 'Ton prénom et nom'),
+      el('input', { class: 'field', id: 'f-nom', name: 'nom', autocomplete: 'name', required: true, maxlength: '120' })),
+    el('div', { class: 'row' }, el('label', { for: 'f-contact' }, 'Ton numéro de téléphone ou ton email'),
+      el('input', { class: 'field', id: 'f-contact', name: 'contact', autocomplete: 'tel', required: true, maxlength: '200', placeholder: '0470 12 34 56' })),
+    el('div', { class: 'row' }, el('label', { for: 'f-rem' }, 'Un mot pour Guillaume (facultatif)'),
+      el('textarea', { class: 'field', id: 'f-rem', name: 'remarque', maxlength: '1000', placeholder: 'Disponibilités pour passer chercher, question...' })),
+    el('div', { class: 'trap', 'aria-hidden': 'true' }, el('label', { for: 'f-web' }, 'Ne pas remplir'),
+      el('input', { id: 'f-web', name: 'website', tabindex: '-1', autocomplete: 'off' })),
+    errorMsg ? el('div', { class: 'alert', role: 'alert' }, errorMsg) : null,
+    el('button', { class: 'btn block', type: 'submit', id: 'submitBtn', style: 'margin-top:18px' }, 'Réserver mon cabas'),
+    el('p', { class: 'note' }, 'Tes articles sont mis de côté tout de suite. Tu paies ensuite par virement, sans carte bancaire.'));
+  form.addEventListener('submit', submitOrder);
+  d.replaceChildren(el('div', { class: 'sheet' },
+    sheetHead('Mon cabas', d),
+    lines,
+    el('div', { class: 'sum' }, el('span', null, 'Total'), el('strong', null, total === 0 && unpriced ? 'À discuter' : fmt(total) + (unpriced ? ' + à discuter' : ''))),
+    unpriced ? el('p', { class: 'note' }, unpriced + ' article' + (unpriced > 1 ? 's' : '') + ' sans prix fixé : Guillaume te confirme le montant final avec toi.') : null,
+    form));
+}
+
+function sheetHead(title, dlg) {
+  return el('div', { class: 'sheet-head' },
+    el('h2', { id: 'cabasTitle' }, title),
+    el('button', { class: 'x', type: 'button', 'aria-label': 'Fermer', onclick: () => dlg.close() }, '×'));
+}
+
+async function submitOrder(e) {
+  e.preventDefault();
+  const f = e.target;
+  const nom = f.nom.value.trim(), contact = f.contact.value.trim();
+  if (nom.length < 2) { drawCabasKeep(f, 'Indique ton prénom et ton nom.'); return; }
+  if (contact.length < 4) { drawCabasKeep(f, 'Indique un numéro de téléphone ou un email pour que Guillaume te joigne.'); return; }
+  const btn = $('submitBtn');
+  btn.disabled = true; btn.textContent = 'Réservation en cours...';
+  try {
+    const res = await fetch(API + '/orders', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: [...cart], nom, contact, remarque: f.remarque.value, website: f.website.value }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.ok) {
+      for (const r of data.reserved) cart.delete(r.id);
+      for (const u of data.unavailable || []) cart.delete(u.id);
+      saveCart();
+      const ticket = { ...data, nom, date: new Date().toISOString() };
+      store.set(KEY_TICKET, ticket);
+      await load(false);
+      showTicket(ticket);
+      return;
+    }
+    if (res.status === 409) {
+      for (const u of data.unavailable || []) cart.delete(u.id);
+      saveCart();
+      await load(false);
+      drawCabas(data.error === 'rien_de_disponible'
+        ? 'Désolé, ces articles viennent d\'être pris par quelqu\'un d\'autre.'
+        : 'Il y a eu un souci avec ton cabas, vérifie-le puis réessaie.');
+      return;
+    }
+    drawCabasKeep(f, res.status === 429
+      ? 'Trop d\'essais d\'affilée. Attends quelques minutes puis réessaie.'
+      : 'La réservation n\'a pas pu aboutir. Réessaie dans un instant.');
+  } catch {
+    drawCabasKeep(f, 'Connexion impossible. Vérifie ton réseau puis réessaie.');
+  }
+}
+
+function drawCabasKeep(form, msg) {
+  const keep = { nom: form.nom.value, contact: form.contact.value, remarque: form.remarque.value };
+  drawCabas(msg);
+  const f = $('orderForm');
+  f.nom.value = keep.nom; f.contact.value = keep.contact; f.remarque.value = keep.remarque;
+}
+
+// ---------- ticket de caisse ----------
+function formatIban(s) { return String(s).replace(/\s+/g, '').replace(/(.{4})/g, '$1 ').trim(); }
+
+async function copy(text, label) {
+  try { await navigator.clipboard.writeText(text); toast(label + ' copié'); }
+  catch { toast('Copie impossible : sélectionne le texte à la main.'); }
+}
+
+function showTicket(t) {
+  const d = $('cabas');
+  const date = new Date(t.date || Date.now());
+  const payBlock = t.iban
+    ? [
+        el('div', { class: 'pay-label' }, 'Bénéficiaire'),
+        el('div', { class: 'pay-val' }, el('span', null, t.beneficiaire || 'Guillaume')),
+        el('div', { class: 'pay-label' }, 'IBAN'),
+        el('div', { class: 'pay-val' }, el('span', null, formatIban(t.iban)),
+          el('button', { class: 'copy', type: 'button', onclick: () => copy(t.iban.replace(/\s+/g, ''), 'IBAN') }, 'Copier')),
+        el('div', { class: 'pay-label' }, 'Communication (à recopier)'),
+        el('div', { class: 'pay-val' }, el('span', { class: 'code' }, t.code),
+          el('button', { class: 'copy', type: 'button', onclick: () => copy(t.code, 'Communication') }, 'Copier')),
+      ]
+    : [el('p', { class: 'thanks' }, 'Guillaume te envoie ses coordonnées bancaires dans la foulée. Garde bien ce code : ' + t.code)];
+  const hasUnpriced = (t.reserved || []).some((r) => r.prix == null);
+  d.replaceChildren(el('div', { class: 'sheet' },
+    sheetHead('Ton ticket', d),
+    el('div', { class: 'receipt' },
+      el('h3', null, 'Le mercadito de Guillaume'),
+      el('div', { class: 'sub' }, 'Ticket ' + t.code + ' · ' + date.toLocaleDateString('fr-BE', { day: 'numeric', month: 'long' })),
+      el('hr'),
+      (t.reserved || []).map((r) => el('div', { class: 'r-line' }, el('span', null, r.nom), el('span', null, r.prix == null ? 'à discuter' : fmt(r.prix)))),
+      el('hr'),
+      el('div', { class: 'r-line r-total' }, el('span', null, 'À VIRER'), el('span', null, fmt(t.total) + (hasUnpriced ? ' + à discuter' : ''))),
+      payBlock,
+      el('hr'),
+      el('p', { class: 'thanks' }, 'Merci ' + (t.nom || '').split(' ')[0] + ' ! Tes articles sont mis de côté. Guillaume confirme la réception du virement puis te contacte pour la remise.'),
+      t.infos_retrait ? el('p', { class: 'thanks' }, t.infos_retrait) : null,
+      (t.unavailable || []).length
+        ? el('p', { class: 'thanks' }, 'Pas de chance : ' + t.unavailable.map((u) => u.nom).join(', ') + ' venait d\'être pris.')
+        : null),
+    el('button', { class: 'btn block', type: 'button', style: 'margin-top:16px', onclick: () => d.close() }, 'Retour au mercadito')));
+  if (!d.open) d.showModal();
+  $('lastTicket').hidden = false;
+}
+
+// ---------- ouverture / mise à jour des fenêtres ----------
+function refreshOpenDialogs() {
+  if ($('detail').open) drawDetail(0);
+}
+
+// ---------- événements ----------
+$('q').addEventListener('input', (e) => { ui.q = e.target.value; render(); });
+$('sort').addEventListener('change', (e) => { ui.sort = e.target.value; render(); });
+$('openCabas').addEventListener('click', openCabas);
+$('lastTicket').addEventListener('click', () => { const t = store.get(KEY_TICKET); if (t) showTicket(t); });
+for (const id of ['detail', 'cabas']) {
+  $(id).addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(true); });
+setInterval(() => { if (!document.hidden && !$('cabas').open) load(true); }, 90000);
+
+if (store.get(KEY_TICKET)) $('lastTicket').hidden = false;
+load(false);
+</script>
+</body>
+</html>

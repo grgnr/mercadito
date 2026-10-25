@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Mercadito, back-office</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Karla:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #F2E9DC; --card: #FDF9F1; --ink: #2E4538; --muted: #566659;
+    --green: #3E7C59; --green-ink: #FDF9F1; --red: #B33A3A;
+    --kraft: #D9C7A3; --kraft-ink: #4A3B22; --line: #E1D5BF;
+    --photo-a: #E7DCC8; --photo-b: #DFD2BA; --photo-ink: #8A7B5E;
+    --shadow: 0 2px 10px rgba(46, 69, 56, .14);
+    --display: 'Bricolage Grotesque', 'Avenir Next', system-ui, sans-serif;
+    --body: Karla, system-ui, -apple-system, sans-serif;
+    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151E18; --card: #1F2B23; --ink: #EDE6D6; --muted: #A3B0A5;
+      --green: #5FAE80; --green-ink: #0F1F14; --red: #E5786F;
+      --kraft: #CDB98F; --kraft-ink: #3A2E16; --line: #2E3D33;
+      --photo-a: #29372E; --photo-b: #243128; --photo-ink: #7F8F82;
+      --shadow: 0 2px 10px rgba(0, 0, 0, .45);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; padding-bottom: 60px; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  a { color: var(--green); }
+  :focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+  .wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  [hidden] { display: none !important; }
+
+  .field { width: 100%; background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; min-height: 44px; font-size: 16px; }
+  .field:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 28%, transparent); }
+  textarea.field { min-height: 90px; resize: vertical; }
+  label { font-weight: 700; font-size: .9rem; }
+  .row { display: grid; gap: 6px; margin-top: 14px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; background: var(--green); color: var(--green-ink); border: 2px solid var(--green); border-radius: 999px; padding: 8px 16px; min-height: 42px; font-weight: 700; font-size: .92rem; }
+  .btn.ghost { background: transparent; color: var(--green); }
+  .btn.danger { background: transparent; border-color: var(--red); color: var(--red); }
+  .btn.danger.armed { background: var(--red); color: #fff; }
+  .btn.small { min-height: 36px; padding: 5px 12px; font-size: .85rem; }
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+  .alert { background: color-mix(in srgb, var(--red) 14%, var(--card)); border: 1.5px solid var(--red); border-radius: 10px; padding: 10px 14px; margin-top: 14px; }
+  .note { color: var(--muted); font-size: .9rem; }
+
+  /* connexion */
+  .login { max-width: 400px; margin: 12vh auto 0; background: var(--card); border-radius: 18px; padding: 28px 24px; box-shadow: var(--shadow); }
+  .login h1 { font-family: var(--display); font-weight: 800; font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -.01em; }
+
+  /* en-tête */
+  .top { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1.5px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+  .top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-top: 12px; padding-bottom: 10px; }
+  .top h1 { font-family: var(--display); font-weight: 800; font-size: 1.25rem; margin: 0; flex: 1 1 auto; }
+  .tabs { display: flex; gap: 6px; width: 100%; overflow-x: auto; }
+  .tab { flex: 0 0 auto; background: transparent; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; font-weight: 700; color: var(--muted); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--green); }
+  .badge { display: inline-block; min-width: 22px; padding: 0 7px; margin-left: 6px; border-radius: 999px; background: var(--red); color: #fff; font-size: .78rem; text-align: center; }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 18px 0 6px; }
+  .stat { background: var(--card); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); }
+  .stat b { display: block; font-family: var(--display); font-weight: 800; font-size: 1.5rem; line-height: 1.1; }
+  .stat span { color: var(--muted); font-size: .85rem; }
+
+  .pills { display: flex; gap: 8px; overflow-x: auto; padding: 14px 0 6px; }
+  .pill { flex: 0 0 auto; white-space: nowrap; background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; padding: 7px 14px; font-weight: 500; font-size: .9rem; }
+  .pill[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: var(--green-ink); font-weight: 700; }
+
+  /* commandes */
+  .order { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 16px; margin-top: 12px; }
+  .order-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; align-items: baseline; }
+  .order-code { font-family: var(--mono); font-weight: 700; font-size: 1.05rem; }
+  .order-who { font-weight: 700; margin-top: 4px; }
+  .order ul { margin: 10px 0; padding-left: 20px; }
+  .order .remark { background: var(--bg); border-radius: 8px; padding: 8px 12px; margin: 8px 0; font-size: .92rem; white-space: pre-line; }
+  .order-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; }
+  .order-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .total { font-family: var(--display); font-weight: 800; font-size: 1.2rem; }
+  .status { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: .78rem; font-weight: 700; border: 1.5px solid currentColor; }
+  .s-nouvelle, .s-reserve { color: var(--kraft-ink); background: var(--kraft); border-color: var(--kraft); }
+  .s-payee, .s-paye { color: var(--green-ink); background: var(--green); border-color: var(--green); }
+  .s-remise, .s-remis { color: var(--muted); }
+  .s-annulee { color: var(--red); }
+  .s-dispo { color: var(--green); }
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+
+  /* articles */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
+  .toolbar .field { flex: 1 1 200px; min-width: 0; }
+  .item { display: grid; grid-template-columns: 64px 1fr; gap: 6px 12px; background: var(--card); border-radius: 12px; padding: 10px; margin-top: 10px; box-shadow: var(--shadow); }
+  .thumb { width: 64px; height: 64px; border-radius: 10px; overflow: hidden; background: repeating-linear-gradient(45deg, var(--photo-a) 0 10px, var(--photo-b) 10px 20px); display: grid; place-items: center; color: var(--photo-ink); font-size: .7rem; text-align: center; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .item-main { min-width: 0; }
+  .item-name { font-weight: 700; overflow-wrap: anywhere; }
+  .item-cat { color: var(--muted); font-size: .85rem; }
+  .item-controls { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .price-in { width: 110px; flex: none; }
+  .euro { color: var(--muted); margin-left: -4px; }
+
+  /* fenêtres */
+  dialog { border: 0; padding: 0; background: var(--card); color: var(--ink); width: min(560px, calc(100vw - 24px)); max-height: min(92vh, calc(100dvh - 24px)); border-radius: 18px; overflow: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, .4); }
+  dialog::backdrop { background: rgba(10, 18, 13, .55); }
+  @media (max-width: 600px) { dialog { margin: auto 0 0; width: 100%; max-width: 100%; border-radius: 18px 18px 0 0; } }
+  .sheet { padding: 0 20px calc(22px + env(safe-area-inset-bottom, 0px)); }
+  .sheet-head { position: sticky; top: 0; z-index: 3; background: var(--card); display: flex; justify-content: space-between; align-items: center; padding: 16px 0 8px; }
+  .sheet-head h2 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.3rem; }
+  .x { background: var(--bg); border: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem; line-height: 1; }
+  .photos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .photo-cell { position: relative; width: 84px; height: 84px; }
+  .photo-cell img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: block; }
+  .photo-cell button { position: absolute; top: -6px; right: -6px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: var(--red); color: #fff; font-size: 1rem; line-height: 1; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 440px) { .grid2 { grid-template-columns: 1fr; } }
+  .form-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 22px; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 100; background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 12px; font-weight: 700; max-width: calc(100vw - 32px); box-shadow: 0 6px 20px rgba(0, 0, 0, .3); }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+'use strict';
+const API = 'https://ggwtoqtwstdjzhkntvai.supabase.co/functions/v1/boutique';
+const KEY = 'mercadito:admin';
+const $ = (id) => document.getElementById(id);
+const eur = new Intl.NumberFormat('fr-BE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const fmt = (n) => eur.format(n);
+const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const ORDER_LABEL = { nouvelle: 'À payer', payee: 'Payée', remise: 'Remise', annulee: 'Annulée' };
+const ITEM_LABEL = { dispo: 'Disponible', reserve: 'Réservé', paye: 'Payé', remis: 'Remis' };
+
+function el(tag, props, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid == null || kid === false) continue;
+    n.append(kid.nodeType ? kid : document.createTextNode(kid));
+  }
+  return n;
+}
+
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+
+let token = store.get(KEY);
+const S = { items: [], orders: [], config: {}, tab: 'commandes', orderFilter: null, itemMode: 'tous', itemQ: '' };
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3200);
+}
+
+class AuthError extends Error {}
+async function api(path, { method = 'GET', body, raw, type } = {}) {
+  const headers = { 'x-admin-token': token || '' };
+  let payload;
+  if (raw) { payload = raw; headers['Content-Type'] = type; }
+  else if (body !== undefined) { payload = JSON.stringify(body); headers['Content-Type'] = 'application/json'; }
+  const res = await fetch(API + path, { method, headers, body: payload });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { logout(); throw new AuthError(); }
+  if (!res.ok || !data.ok) throw new Error(data.error || 'erreur');
+  return data;
+}
+
+function logout() { token = null; store.del(KEY); renderLogin(); }
+
+// ---------- connexion ----------
+function renderLogin(msg) {
+  $('app').replaceChildren(el('div', { class: 'wrap' },
+    el('form', { class: 'login', onsubmit: doLogin },
+      el('h1', null, 'Mercadito'),
+      el('p', { class: 'note' }, 'Back-office de Guillaume'),
+      el('div', { class: 'row' }, el('label', { for: 'pw' }, 'Mot de passe'),
+        el('input', { class: 'field', id: 'pw', type: 'password', autocomplete: 'current-password', required: true })),
+      msg ? el('div', { class: 'alert', role: 'alert' }, msg) : null,
+      el('button', { class: 'btn', type: 'submit', style: 'margin-top:18px;width:100%' }, 'Entrer'))));
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const pw = $('pw').value;
+  const btn = e.target.querySelector('button'); btn.disabled = true;
+  try {
+    const res = await fetch(API + '/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.ok) { token = data.token; store.set(KEY, token); await refresh(true); return; }
+    renderLogin(res.status === 429 ? 'Trop d\'essais. Attends quelques minutes.' : 'Mot de passe incorrect.');
+  } catch { renderLogin('Connexion impossible. Réessaie.'); }
+}
+
+// ---------- données ----------
+async function refresh(first) {
+  try {
+    const d = await api('/admin/data');
+    S.items = d.items; S.orders = d.orders; S.config = d.config;
+    if (first) S.orderFilter = S.orders.some((o) => o.statut === 'nouvelle') ? 'nouvelle' : 'toutes';
+    render();
+  } catch (e) { if (!(e instanceof AuthError)) toast('Impossible de charger les données.'); }
+}
+
+// ---------- structure ----------
+function render() {
+  const open = S.orders.filter((o) => o.statut === 'nouvelle').length;
+  const tabs = [['commandes', 'Commandes', open], ['articles', 'Articles', 0], ['reglages', 'Réglages', 0]];
+  $('app').replaceChildren(
+    el('div', { class: 'top' }, el('div', { class: 'wrap' },
+      el('h1', null, 'Mercadito · back-office'),
+      el('button', { class: 'btn ghost small', type: 'button', onclick: () => refresh() }, 'Actualiser'),
+      el('button', { class: 'btn ghost small', type: 'button', onclick: logout }, 'Quitter'),
+      el('div', { class: 'tabs', role: 'tablist' }, tabs.map(([id, label, n]) =>
+        el('button', { class: 'tab', role: 'tab', 'aria-selected': String(S.tab === id), onclick: () => { S.tab = id; render(); } },
+          label, n ? el('span', { class: 'badge' }, n) : null))))),
+    el('main', { class: 'wrap' }, stats(), S.tab === 'commandes' ? viewOrders() : S.tab === 'articles' ? viewItems() : viewSettings()));
+}
+
+function stats() {
+  const n = (s) => S.items.filter((i) => i.statut === s).length;
+  const sum = (sts) => S.orders.filter((o) => sts.includes(o.statut)).reduce((a, o) => a + Number(o.total), 0);
+  const cell = (v, l) => el('div', { class: 'stat' }, el('b', null, String(v)), el('span', null, l));
+  return el('div', { class: 'stats' },
+    cell(n('dispo'), 'articles disponibles'),
+    cell(n('reserve'), 'réservés, à payer'),
+    cell(n('paye'), 'payés, à remettre'),
+    cell(n('remis'), 'remis'),
+    cell(fmt(sum(['payee', 'remise'])), 'encaissé'),
+    cell(fmt(sum(['nouvelle'])), 'en attente de virement'));
+}
+
+// ---------- commandes ----------
+const armed = new Set();
+function viewOrders() {
+  const counts = { nouvelle: 0, payee: 0, remise: 0, annulee: 0 };
+  S.orders.forEach((o) => counts[o.statut]++);
+  const filters = [['nouvelle', 'À payer'], ['payee', 'À remettre'], ['remise', 'Remises'], ['annulee', 'Annulées'], ['toutes', 'Toutes']];
+  const list = S.orders.filter((o) => S.orderFilter === 'toutes' || o.statut === S.orderFilter);
+  return el('div', null,
+    el('div', { class: 'pills' }, filters.map(([id, label]) =>
+      el('button', { class: 'pill', type: 'button', 'aria-pressed': String(S.orderFilter === id), onclick: () => { S.orderFilter = id; render(); } },
+        label + (id === 'toutes' ? ' (' + S.orders.length + ')' : ' (' + counts[id] + ')')))),
+    list.length ? list.map(orderCard) : el('p', { class: 'empty' }, 'Aucune commande dans cette vue.'));
+}
+
+function contactLink(c) {
+  if (/@/.test(c)) return el('a', { href: 'mailto:' + encodeURIComponent(c) }, c);
+  const digits = c.replace(/[^\d+]/g, '');
+  if (digits.replace(/\D/g, '').length >= 8) {
+    const intl = digits.startsWith('+') ? digits.slice(1) : digits.startsWith('00') ? digits.slice(2) : digits.startsWith('0') ? '32' + digits.slice(1) : digits;
+    return el('span', null, c, ' · ', el('a', { href: 'https://wa.me/' + intl, target: '_blank', rel: 'noopener noreferrer' }, 'WhatsApp'));
+  }
+  return c;
+}
+
+function orderCard(o) {
+  const lines = (o.vente_order_items || []).map((l) =>
+    el('li', null, (l.vente_items && l.vente_items.nom) || 'Article supprimé', l.prix_au_moment != null ? ' · ' + fmt(l.prix_au_moment) : ' · prix à discuter'));
+  const act = (label, statut, cls, confirm) => {
+    const key = o.id + statut;
+    const isArmed = armed.has(key);
+    return el('button', {
+      class: 'btn small ' + (cls || '') + (isArmed ? ' armed' : ''), type: 'button',
+      onclick: async () => {
+        if (confirm && !isArmed) { armed.add(key); setTimeout(() => { armed.delete(key); if (S.tab === 'commandes') render(); }, 4000); render(); return; }
+        armed.delete(key);
+        try { await api('/admin/orders/' + o.id + '/status', { method: 'POST', body: { statut } }); toast('Commande mise à jour'); await refresh(); }
+        catch (e) { if (!(e instanceof AuthError)) toast('Mise à jour impossible.'); }
+      },
+    }, isArmed ? 'Confirmer ?' : label);
+  };
+  const actions = {
+    nouvelle: [act('Virement reçu', 'payee'), act('Annuler', 'annulee', 'danger', true)],
+    payee: [act('Marquer comme remise', 'remise'), act('Annuler', 'annulee', 'danger', true)],
+    remise: [act('Remettre en payée', 'payee', 'ghost')],
+    annulee: [],
+  }[o.statut];
+  const date = new Date(o.created_at).toLocaleString('fr-BE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return el('article', { class: 'order' },
+    el('div', { class: 'order-head' },
+      el('span', { class: 'order-code' }, o.code),
+      el('span', null, el('span', { class: 'status s-' + o.statut }, ORDER_LABEL[o.statut]), ' ', el('span', { class: 'note' }, date))),
+    el('div', { class: 'order-who' }, o.client_nom),
+    el('div', { class: 'note' }, contactLink(o.client_contact)),
+    el('ul', null, lines),
+    o.remarque ? el('div', { class: 'remark' }, o.remarque) : null,
+    el('div', { class: 'order-foot' },
+      el('span', { class: 'total' }, Number(o.total) === 0 && (o.vente_order_items || []).some((l) => l.prix_au_moment == null) ? 'Prix à discuter' : fmt(o.total)),
+      el('div', { class: 'order-actions' }, actions)));
+}
+
+// ---------- articles ----------
+function viewItems() {
+  const q = norm(S.itemQ);
+  const modes = [['tous', 'Tous (' + S.items.length + ')'], ['sansprix', 'Sans prix (' + S.items.filter((i) => i.prix == null).length + ')'],
+    ['sansphoto', 'Sans photo (' + S.items.filter((i) => !(i.photos || []).length).length + ')'], ['dispo', 'Disponibles'], ['pris', 'Réservés ou vendus']];
+  const list = S.items.filter((i) =>
+    (!q || norm(i.nom + ' ' + i.categorie).includes(q)) &&
+    ({ tous: true, sansprix: i.prix == null, sansphoto: !(i.photos || []).length, dispo: i.statut === 'dispo', pris: i.statut !== 'dispo' }[S.itemMode]));
+  return el('div', null,
+    el('div', { class: 'toolbar' },
+      el('input', { class: 'field', type: 'search', placeholder: 'Rechercher un article', value: S.itemQ, 'aria-label': 'Rechercher', oninput: (e) => { S.itemQ = e.target.value; rerenderList(); } }),
+      el('button', { class: 'btn', type: 'button', onclick: () => editItem(null) }, 'Nouvel article')),
+    el('div', { class: 'pills' }, modes.map(([id, label]) =>
+      el('button', { class: 'pill', type: 'button', 'aria-pressed': String(S.itemMode === id), onclick: () => { S.itemMode = id; render(); } }, label))),
+    el('div', { id: 'itemList' }, list.length ? list.map(itemRow) : el('p', { class: 'empty' }, 'Aucun article dans cette vue.')));
+}
+
+function rerenderList() {
+  // met à jour seulement la liste pour garder le focus dans la recherche
+  const keep = document.activeElement && document.activeElement.type === 'search' ? document.activeElement : null;
+  const old = $('itemList');
+  const fresh = viewItems().querySelector('#itemList');
+  old.replaceWith(fresh);
+  if (keep) keep.focus();
+}
+
+async function saveItem(item, patch) {
+  const body = { id: item.id, nom: item.nom, description: item.description, categorie: item.categorie, prix: item.prix, lien_externe: item.lien_externe, photos: item.photos, ...patch };
+  const d = await api('/admin/items', { method: 'POST', body });
+  const i = S.items.findIndex((x) => x.id === item.id);
+  if (i >= 0) S.items[i] = d.item;
+  return d.item;
+}
+
+function itemRow(it) {
+  const thumb = el('div', { class: 'thumb' }, it.photos && it.photos[0] ? el('img', { src: it.photos[0], alt: '', loading: 'lazy' }) : 'Pas de photo');
+  const price = el('input', {
+    class: 'field price-in', type: 'number', inputmode: 'decimal', min: '0', step: '0.5', placeholder: 'Prix',
+    value: it.prix == null ? '' : String(it.prix), 'aria-label': 'Prix de ' + it.nom,
+    onchange: async (e) => {
+      try { await saveItem(it, { prix: e.target.value === '' ? null : e.target.value }); toast('Prix enregistré'); render(); }
+      catch (err) { if (!(err instanceof AuthError)) toast('Prix invalide.'); }
+    },
+  });
+  const file = el('input', {
+    type: 'file', accept: 'image/*', multiple: true, hidden: true,
+    onchange: async (e) => {
+      try { const urls = await uploadFiles(e.target.files); if (urls.length) { await saveItem(it, { photos: [...(it.photos || []), ...urls].slice(0, 8) }); toast('Photo ajoutée'); render(); } }
+      catch (err) { if (!(err instanceof AuthError)) toast('Envoi de la photo impossible.'); }
+    },
+  });
+  return el('div', { class: 'item' },
+    thumb,
+    el('div', { class: 'item-main' },
+      el('div', { class: 'item-name' }, it.nom),
+      el('div', { class: 'item-cat' }, it.categorie + ' · ', el('span', { class: 'status s-' + it.statut }, ITEM_LABEL[it.statut]))),
+    el('div', { class: 'item-controls' },
+      price, el('span', { class: 'euro' }, '€'),
+      el('button', { class: 'btn ghost small', type: 'button', onclick: () => file.click() }, 'Ajouter photo'), file,
+      el('button', { class: 'btn ghost small', type: 'button', onclick: () => editItem(it) }, 'Modifier')));
+}
+
+// ---------- photos ----------
+async function compress(file) {
+  const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+  const scale = Math.min(1, 1200 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+  c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+  return new Promise((r) => c.toBlob(r, 'image/jpeg', 0.82));
+}
+
+async function uploadFiles(files) {
+  const urls = [];
+  for (const f of files) {
+    try {
+      const blob = await compress(f);
+      const d = await api('/admin/upload', { method: 'POST', raw: blob, type: 'image/jpeg' });
+      urls.push(d.url);
+    } catch (err) { if (err instanceof AuthError) throw err; toast('Photo ignorée : ' + f.name); }
+  }
+  return urls;
+}
+
+// ---------- fiche article ----------
+function editItem(it) {
+  const isNew = !it;
+  const cur = it ? { ...it, photos: [...(it.photos || [])] } : { nom: '', categorie: '', description: '', prix: null, lien_externe: '', photos: [], statut: 'dispo' };
+  const dlg = $('dlg');
+  const cats = [...new Set(S.items.map((i) => i.categorie))].sort();
+  const photosBox = el('div', { class: 'photos' });
+  const drawPhotos = () => photosBox.replaceChildren(...cur.photos.map((p, i) =>
+    el('div', { class: 'photo-cell' }, el('img', { src: p, alt: '' }),
+      el('button', { type: 'button', 'aria-label': 'Retirer la photo', onclick: () => { cur.photos.splice(i, 1); drawPhotos(); } }, '×'))));
+  drawPhotos();
+  const fileIn = el('input', {
+    type: 'file', accept: 'image/*', multiple: true, hidden: true,
+    onchange: async (e) => { const urls = await uploadFiles(e.target.files); cur.photos = [...cur.photos, ...urls].slice(0, 8); drawPhotos(); },
+  });
+  const errBox = el('div');
+  let delArmed = false;
+  const delBtn = isNew ? null : el('button', {
+    class: 'btn danger small', type: 'button',
+    onclick: async () => {
+      if (!delArmed) { delArmed = true; delBtn.textContent = 'Confirmer la suppression ?'; delBtn.classList.add('armed'); return; }
+      try { await api('/admin/items/' + it.id, { method: 'DELETE' }); S.items = S.items.filter((x) => x.id !== it.id); dlg.close(); toast('Article supprimé'); render(); }
+      catch (err) { if (!(err instanceof AuthError)) { errBox.replaceChildren(el('div', { class: 'alert' }, err.message === 'article_en_commande' ? 'Cet article est dans une commande : annule la commande d\'abord.' : 'Suppression impossible.')); } }
+    },
+  }, 'Supprimer');
+  const form = el('form', {
+    onsubmit: async (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const body = { id: it && it.id, nom: f.nom.value, categorie: f.categorie.value, prix: f.prix.value === '' ? null : f.prix.value, description: f.description.value, lien_externe: f.lien.value, photos: cur.photos };
+      if (!isNew && f.statut.value !== it.statut) body.statut = f.statut.value;
+      try {
+        const d = await api('/admin/items', { method: 'POST', body });
+        if (isNew) S.items.push(d.item); else S.items[S.items.findIndex((x) => x.id === it.id)] = d.item;
+        dlg.close(); toast('Article enregistré'); render();
+      } catch (err) {
+        if (err instanceof AuthError) return;
+        const m = { nom_requis: 'Donne un nom à l\'article.', prix_invalide: 'Le prix doit être un nombre positif.', lien_invalide: 'Le lien doit commencer par http:// ou https://.' };
+        errBox.replaceChildren(el('div', { class: 'alert', role: 'alert' }, m[err.message] || 'Enregistrement impossible.'));
+      }
+    },
+  },
+    el('div', { class: 'row' }, el('label', { for: 'e-nom' }, 'Nom'), el('input', { class: 'field', id: 'e-nom', name: 'nom', value: cur.nom, required: true, maxlength: '200' })),
+    el('div', { class: 'grid2' },
+      el('div', { class: 'row' }, el('label', { for: 'e-cat' }, 'Catégorie'),
+        el('input', { class: 'field', id: 'e-cat', name: 'categorie', value: cur.categorie, list: 'cats', placeholder: 'Meubles', maxlength: '60' }),
+        el('datalist', { id: 'cats' }, cats.map((c) => el('option', { value: c })))),
+      el('div', { class: 'row' }, el('label', { for: 'e-prix' }, 'Prix en euros (vide = à discuter)'),
+        el('input', { class: 'field', id: 'e-prix', name: 'prix', type: 'number', inputmode: 'decimal', min: '0', step: '0.5', value: cur.prix == null ? '' : String(cur.prix) }))),
+    el('div', { class: 'row' }, el('label', { for: 'e-desc' }, 'Description (état, dimensions, âge...)'), el('textarea', { class: 'field', id: 'e-desc', name: 'description', maxlength: '2000' }, cur.description)),
+    el('div', { class: 'row' }, el('label', { for: 'e-lien' }, 'Lien vers le produit d\'origine (facultatif)'), el('input', { class: 'field', id: 'e-lien', name: 'lien', type: 'url', value: cur.lien_externe || '', placeholder: 'https://' })),
+    el('div', { class: 'row' }, el('label', null, 'Photos'), photosBox,
+      el('div', null, el('button', { class: 'btn ghost small', type: 'button', onclick: () => fileIn.click() }, 'Ajouter des photos'), fileIn)),
+    isNew ? el('input', { type: 'hidden', name: 'statut', value: 'dispo' })
+      : el('div', { class: 'row' }, el('label', { for: 'e-statut' }, 'Statut (à forcer seulement en cas de correction)'),
+          el('select', { class: 'field', id: 'e-statut', name: 'statut' }, Object.entries(ITEM_LABEL).map(([v, l]) => el('option', { value: v, selected: v === it.statut }, l)))),
+    errBox,
+    el('div', { class: 'form-actions' }, el('button', { class: 'btn', type: 'submit' }, 'Enregistrer'), delBtn));
+  dlg.replaceChildren(el('div', { class: 'sheet' },
+    el('div', { class: 'sheet-head' }, el('h2', null, isNew ? 'Nouvel article' : 'Modifier l\'article'), el('button', { class: 'x', type: 'button', 'aria-label': 'Fermer', onclick: () => dlg.close() }, '×')),
+    form));
+  dlg.showModal();
+}
+
+// ---------- réglages ----------
+function viewSettings() {
+  const shopUrl = new URL('../', location.href).href;
+  const errBox = el('div');
+  return el('div', null,
+    el('form', {
+      style: 'margin-top:20px;max-width:520px',
+      onsubmit: async (e) => {
+        e.preventDefault();
+        const f = e.target;
+        try {
+          const d = await api('/admin/config', { method: 'POST', body: { iban: f.iban.value, beneficiaire: f.beneficiaire.value, infos_retrait: f.retrait.value, new_password: f.pw.value } });
+          if (d.token) { token = d.token; store.set(KEY, token); }
+          f.pw.value = ''; toast('Réglages enregistrés'); await refresh();
+        } catch (err) {
+          if (err instanceof AuthError) return;
+          errBox.replaceChildren(el('div', { class: 'alert', role: 'alert' }, err.message === 'mot_de_passe_court' ? 'Le mot de passe doit faire au moins 8 caractères.' : 'Enregistrement impossible.'));
+        }
+      },
+    },
+      el('p', { class: 'note' }, 'Ces informations s\'affichent sur le ticket de caisse après chaque réservation.'),
+      el('div', { class: 'row' }, el('label', { for: 's-iban' }, 'IBAN'), el('input', { class: 'field', id: 's-iban', name: 'iban', value: S.config.iban || '', placeholder: 'BE00 0000 0000 0000', autocomplete: 'off' })),
+      el('div', { class: 'row' }, el('label', { for: 's-ben' }, 'Nom du bénéficiaire'), el('input', { class: 'field', id: 's-ben', name: 'beneficiaire', value: S.config.beneficiaire || '' })),
+      el('div', { class: 'row' }, el('label', { for: 's-ret' }, 'Infos de remise (adresse, créneaux...)'), el('textarea', { class: 'field', id: 's-ret', name: 'retrait' }, S.config.infos_retrait || '')),
+      el('div', { class: 'row' }, el('label', { for: 's-pw' }, 'Nouveau mot de passe (laisser vide pour ne pas changer)'), el('input', { class: 'field', id: 's-pw', name: 'pw', type: 'password', autocomplete: 'new-password' })),
+      errBox,
+      el('button', { class: 'btn', type: 'submit', style: 'margin-top:20px' }, 'Enregistrer')),
+    el('div', { class: 'row', style: 'margin-top:30px;max-width:520px' },
+      el('label', null, 'Lien de la boutique à partager'),
+      el('input', { class: 'field', readonly: true, value: shopUrl, onfocus: (e) => e.target.select() }),
+      el('button', { class: 'btn ghost small', type: 'button', style: 'justify-self:start', onclick: async () => { try { await navigator.clipboard.writeText(shopUrl); toast('Lien copié'); } catch { toast('Sélectionne le lien et copie-le à la main.'); } } }, 'Copier le lien')));
+}
+
+if (token) refresh(true); else renderLogin();
+</script>
+</body>
+</html>
