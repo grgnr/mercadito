@@ -96,7 +96,7 @@
   }
   .lede { margin: 12px 0 0; max-width: 56ch; font-size: 1.08rem; color: var(--muted); }
   .mot {
-    margin: 18px 0 0; max-width: 62ch;
+    margin: 18px 0 0;
     background: var(--card); border: 1.5px dashed var(--kraft); border-left: 6px solid var(--kraft);
     border-radius: 14px; padding: 14px 18px 12px;
   }
@@ -106,6 +106,10 @@
   .mot li::before { content: "♥"; position: absolute; left: 0; top: 0; color: var(--red); font-size: .85em; }
   .mot strong { color: var(--ink); }
   .mot-sign { margin: 10px 0 0; font-size: .92rem; color: var(--muted); font-style: italic; }
+  @media (min-width: 900px) {
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; padding-top: 40px; }
+    .mot { margin: 0; padding: 18px 22px 16px; }
+  }
   .mot-sign .who { display: block; margin-top: 4px; font-style: normal; font-weight: 700; color: var(--green); }
   .steps { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 16px 0 0; padding: 0; list-style: none; font-weight: 500; font-size: .95rem; }
   .steps li::before { content: "→ "; color: var(--green); font-weight: 700; }
@@ -290,9 +294,17 @@
 <div class="picado" aria-hidden="true"></div>
 
 <header class="wrap hero">
+  <div class="hero-main">
   <p class="kicker">Départ pour le Mexique</p>
   <h1>El mercadito de Guillaume&nbsp;&amp;&nbsp;Pau</h1>
   <p class="lede">On part vivre au Mexique et tout ne rentre pas dans les valises. Plutôt que de vendre nos affaires à des inconnus, on préfère qu'elles continuent leur vie chez vous.</p>
+  <ul class="steps">
+    <li>Choisis dans le cabas</li>
+    <li>Réserve en un clic</li>
+    <li>Paie par virement</li>
+  </ul>
+  <button class="ticket-link" id="lastTicket" type="button" hidden>Revoir mon dernier ticket</button>
+  </div>
   <aside class="mot" aria-labelledby="mot-titre">
     <h2 id="mot-titre">Le petit mot sur les prix</h2>
     <ul>
@@ -302,12 +314,6 @@
     </ul>
     <p class="mot-sign">Un prix te freine&nbsp;? Écris-nous, ou glisse ta proposition dans la remarque au moment de réserver.<span class="who">Guillaume&nbsp;&amp;&nbsp;Pau</span></p>
   </aside>
-  <ul class="steps">
-    <li>Choisis dans le cabas</li>
-    <li>Réserve en un clic</li>
-    <li>Paie par virement</li>
-  </ul>
-  <button class="ticket-link" id="lastTicket" type="button" hidden>Revoir mon dernier ticket</button>
 </header>
 
 <main class="wrap">
