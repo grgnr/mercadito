@@ -223,6 +223,11 @@ async function refresh(first) {
   } catch (e) { if (!(e instanceof AuthError)) toast('Impossible de charger les données.'); }
 }
 
+document.addEventListener('visibilitychange', () => {
+  const editing = document.querySelector('dialog[open]') || document.activeElement?.matches('input, textarea, select');
+  if (document.visibilityState === 'visible' && token && S.items && !editing) refresh();
+});
+
 // ---------- structure ----------
 function render() {
   const open = S.orders.filter((o) => o.statut === 'nouvelle').length;
