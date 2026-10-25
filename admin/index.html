@@ -487,12 +487,13 @@ function viewSettings() {
         e.preventDefault();
         const f = e.target;
         try {
-          const d = await api('/admin/config', { method: 'POST', body: { iban: f.iban.value, beneficiaire: f.beneficiaire.value, infos_retrait: f.retrait.value, new_password: f.pw.value } });
+          const d = await api('/admin/config', { method: 'POST', body: { iban: f.iban.value, beneficiaire: f.beneficiaire.value, infos_retrait: f.retrait.value, new_password: f.pw.value, notify_email: f.notify.value, resend_api_key: f.resend.value } });
           if (d.token) { token = d.token; store.set(KEY, token); }
-          f.pw.value = ''; toast('Réglages enregistrés'); await refresh();
+          f.pw.value = ''; f.resend.value = ''; toast('Réglages enregistrés'); await refresh();
         } catch (err) {
           if (err instanceof AuthError) return;
-          errBox.replaceChildren(el('div', { class: 'alert', role: 'alert' }, err.message === 'mot_de_passe_court' ? 'Le mot de passe doit faire au moins 8 caractères.' : 'Enregistrement impossible.'));
+          const msg = { mot_de_passe_court: 'Le mot de passe doit faire au moins 8 caractères.', email_invalide: 'L\'adresse email de notification n\'est pas valide.', cle_invalide: 'La clé Resend doit commencer par « re_ ».' }[err.message] || 'Enregistrement impossible.';
+          errBox.replaceChildren(el('div', { class: 'alert', role: 'alert' }, msg));
         }
       },
     },
@@ -501,6 +502,21 @@ function viewSettings() {
       el('div', { class: 'row' }, el('label', { for: 's-ben' }, 'Nom du bénéficiaire'), el('input', { class: 'field', id: 's-ben', name: 'beneficiaire', value: S.config.beneficiaire || '' })),
       el('div', { class: 'row' }, el('label', { for: 's-ret' }, 'Infos de remise (adresse, créneaux...)'), el('textarea', { class: 'field', id: 's-ret', name: 'retrait' }, S.config.infos_retrait || '')),
       el('div', { class: 'row' }, el('label', { for: 's-pw' }, 'Nouveau mot de passe (laisser vide pour ne pas changer)'), el('input', { class: 'field', id: 's-pw', name: 'pw', type: 'password', autocomplete: 'new-password' })),
+      el('h2', { style: 'margin:28px 0 0;font-size:1.05rem' }, 'Notifications de commande'),
+      el('p', { class: 'note' }, 'Un email part à chaque nouvelle commande. Il faut un compte gratuit sur resend.com, créé avec cette même adresse email.'),
+      el('div', { class: 'row' }, el('label', { for: 's-notify' }, 'Recevoir les commandes sur'), el('input', { class: 'field', id: 's-notify', name: 'notify', type: 'email', value: S.config.notify_email || '', placeholder: 'ton@email.com', autocomplete: 'email' })),
+      el('div', { class: 'row' }, el('label', { for: 's-resend' }, S.config.resend_configured ? 'Clé API Resend (déjà enregistrée, laisser vide pour la garder)' : 'Clé API Resend'), el('input', { class: 'field', id: 's-resend', name: 'resend', type: 'password', placeholder: 're_...', autocomplete: 'off' })),
+      el('button', {
+        class: 'btn ghost small', type: 'button', style: 'margin-top:10px',
+        onclick: async (e) => {
+          const b = e.currentTarget; b.disabled = true;
+          try { await api('/admin/notify-test', { method: 'POST', body: {} }); toast('Email de test envoyé : regarde ta boîte de réception.'); }
+          catch (err) {
+            if (err instanceof AuthError) return;
+            toast({ non_configure: 'Enregistre d\'abord l\'adresse et la clé Resend.', cle_refusee: 'Resend refuse la clé. Vérifie-la.', envoi_refuse: 'Resend a refusé l\'envoi. L\'adresse doit être celle de ton compte Resend.' }[err.message] || 'Envoi impossible pour le moment.');
+          } finally { b.disabled = false; }
+        },
+      }, 'Envoyer un email de test'),
       errBox,
       el('button', { class: 'btn', type: 'submit', style: 'margin-top:20px' }, 'Enregistrer')),
     el('div', { class: 'row', style: 'margin-top:30px;max-width:520px' },
