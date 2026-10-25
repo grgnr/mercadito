@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Le mercadito de Guillaume</title>
-<meta name="description" content="Départ pour le Mexique : meubles, jeux et petits objets à prendre. Mets dans le cabas, réserve, vire.">
+<title>El mercadito de Guillaume & Pau</title>
+<meta name="description" content="Guillaume & Pau partent au Mexique : meubles, jeux et petits objets à prix d'amis. Mets dans le cabas, réserve, vire.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Karla:wght@400;500;700&display=swap">
@@ -95,6 +95,18 @@
     text-wrap: balance;
   }
   .lede { margin: 12px 0 0; max-width: 56ch; font-size: 1.08rem; color: var(--muted); }
+  .mot {
+    margin: 18px 0 0; max-width: 62ch;
+    background: var(--card); border: 1.5px dashed var(--kraft); border-left: 6px solid var(--kraft);
+    border-radius: 14px; padding: 14px 18px 12px;
+  }
+  .mot h2 { margin: 0 0 8px; font-family: var(--display); font-weight: 700; font-size: 1.05rem; color: var(--green); }
+  .mot ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+  .mot li { position: relative; padding-left: 20px; line-height: 1.45; }
+  .mot li::before { content: "♥"; position: absolute; left: 0; top: 0; color: var(--red); font-size: .85em; }
+  .mot strong { color: var(--ink); }
+  .mot-sign { margin: 10px 0 0; font-size: .92rem; color: var(--muted); font-style: italic; }
+  .mot-sign .who { display: block; margin-top: 4px; font-style: normal; font-weight: 700; color: var(--green); }
   .steps { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 16px 0 0; padding: 0; list-style: none; font-weight: 500; font-size: .95rem; }
   .steps li::before { content: "→ "; color: var(--green); font-weight: 700; }
   .ticket-link {
@@ -279,12 +291,21 @@
 
 <header class="wrap hero">
   <p class="kicker">Départ pour le Mexique</p>
-  <h1>Le mercadito de Guillaume</h1>
-  <p class="lede">Tout doit partir avant le grand voyage. Servez-vous, mettez dans le cabas, et on s'arrange pour la remise.</p>
+  <h1>El mercadito de Guillaume&nbsp;&amp;&nbsp;Pau</h1>
+  <p class="lede">On part vivre au Mexique et tout ne rentre pas dans les valises. Plutôt que de vendre nos affaires à des inconnus, on préfère qu'elles continuent leur vie chez vous.</p>
+  <aside class="mot" aria-labelledby="mot-titre">
+    <h2 id="mot-titre">Le petit mot sur les prix</h2>
+    <ul>
+      <li><strong>Ce sont des prix d'amis.</strong> On a regardé ce que ces objets valent en seconde main, puis retiré 20 à 25&nbsp;%.</li>
+      <li><strong>On n'a pas tout vérifié à la main.</strong> Si un prix te paraît bizarre, dis-le-nous, sans gêne.</li>
+      <li><strong>Le but, c'est de vider et de faire plaisir</strong>, pas de faire une affaire. Les prix sont un repère, pas une barrière : tout reste discutable, dans la limite du raisonnable.</li>
+    </ul>
+    <p class="mot-sign">Un prix te freine&nbsp;? Écris-nous, ou glisse ta proposition dans la remarque au moment de réserver.<span class="who">Guillaume&nbsp;&amp;&nbsp;Pau</span></p>
+  </aside>
   <ul class="steps">
     <li>Choisis dans le cabas</li>
     <li>Réserve en un clic</li>
-    <li>Vire sur mon compte</li>
+    <li>Paie par virement</li>
   </ul>
   <button class="ticket-link" id="lastTicket" type="button" hidden>Revoir mon dernier ticket</button>
 </header>
@@ -523,7 +544,7 @@ function drawDetail(photoIndex) {
     el('p', { class: 'detail-price' }, it.prix == null ? 'Prix à discuter' : fmt(it.prix)),
     el('p', { class: 'cat' }, it.categorie + (available ? '' : ' · ' + (it.statut === 'reserve' ? 'déjà réservé' : 'déjà vendu'))),
     it.description ? el('p', { class: 'detail-desc' }, it.description) : null,
-    it.photos_illustration && photos.length ? el('p', { class: 'note' }, 'La photo montre le modèle neuf. Demande à Guillaume si tu veux voir l\'objet lui-même.') : null,
+    it.photos_illustration && photos.length ? el('p', { class: 'note' }, 'La photo montre le modèle neuf. Demande-nous si tu veux voir l\'objet lui-même.') : null,
     link,
     available
       ? el('div', { class: 'detail-actions' },
@@ -562,8 +583,8 @@ function drawCabas(errorMsg) {
       el('input', { class: 'field', id: 'f-nom', name: 'nom', autocomplete: 'name', required: true, maxlength: '120' })),
     el('div', { class: 'row' }, el('label', { for: 'f-contact' }, 'Ton numéro de téléphone ou ton email'),
       el('input', { class: 'field', id: 'f-contact', name: 'contact', autocomplete: 'tel', required: true, maxlength: '200', placeholder: '0470 12 34 56' })),
-    el('div', { class: 'row' }, el('label', { for: 'f-rem' }, 'Un mot pour Guillaume (facultatif)'),
-      el('textarea', { class: 'field', id: 'f-rem', name: 'remarque', maxlength: '1000', placeholder: 'Disponibilités pour passer chercher, question...' })),
+    el('div', { class: 'row' }, el('label', { for: 'f-rem' }, 'Un mot pour nous (facultatif)'),
+      el('textarea', { class: 'field', id: 'f-rem', name: 'remarque', maxlength: '1000', placeholder: 'Disponibilités pour passer chercher, question, proposition de prix...' })),
     el('div', { class: 'trap', 'aria-hidden': 'true' }, el('label', { for: 'f-web' }, 'Ne pas remplir'),
       el('input', { id: 'f-web', name: 'website', tabindex: '-1', autocomplete: 'off' })),
     errorMsg ? el('div', { class: 'alert', role: 'alert' }, errorMsg) : null,
@@ -574,7 +595,7 @@ function drawCabas(errorMsg) {
     sheetHead('Mon cabas', d),
     lines,
     el('div', { class: 'sum' }, el('span', null, 'Total'), el('strong', null, total === 0 && unpriced ? 'À discuter' : fmt(total) + (unpriced ? ' + à discuter' : ''))),
-    unpriced ? el('p', { class: 'note' }, unpriced + ' article' + (unpriced > 1 ? 's' : '') + ' sans prix fixé : Guillaume te confirme le montant final avec toi.') : null,
+    unpriced ? el('p', { class: 'note' }, unpriced + ' article' + (unpriced > 1 ? 's' : '') + ' sans prix fixé : on se met d\'accord sur le montant ensemble.') : null,
     form));
 }
 
@@ -589,7 +610,7 @@ async function submitOrder(e) {
   const f = e.target;
   const nom = f.nom.value.trim(), contact = f.contact.value.trim();
   if (nom.length < 2) { drawCabasKeep(f, 'Indique ton prénom et ton nom.'); return; }
-  if (contact.length < 4) { drawCabasKeep(f, 'Indique un numéro de téléphone ou un email pour que Guillaume te joigne.'); return; }
+  if (contact.length < 4) { drawCabasKeep(f, 'Indique un numéro de téléphone ou un email pour qu\'on puisse te joindre.'); return; }
   const btn = $('submitBtn');
   btn.disabled = true; btn.textContent = 'Réservation en cours...';
   try {
@@ -654,12 +675,12 @@ function showTicket(t) {
         el('div', { class: 'pay-val' }, el('span', { class: 'code' }, t.code),
           el('button', { class: 'copy', type: 'button', onclick: () => copy(t.code, 'Communication') }, 'Copier')),
       ]
-    : [el('p', { class: 'thanks' }, 'Guillaume te envoie ses coordonnées bancaires dans la foulée. Garde bien ce code : ' + t.code)];
+    : [el('p', { class: 'thanks' }, 'On t\'envoie nos coordonnées bancaires dans la foulée. Garde bien ce code : ' + t.code)];
   const hasUnpriced = (t.reserved || []).some((r) => r.prix == null);
   d.replaceChildren(el('div', { class: 'sheet' },
     sheetHead('Ton ticket', d),
     el('div', { class: 'receipt' },
-      el('h3', null, 'Le mercadito de Guillaume'),
+      el('h3', null, 'El mercadito de Guillaume & Pau'),
       el('div', { class: 'sub' }, 'Ticket ' + t.code + ' · ' + date.toLocaleDateString('fr-BE', { day: 'numeric', month: 'long' })),
       el('hr'),
       (t.reserved || []).map((r) => el('div', { class: 'r-line' }, el('span', null, r.nom), el('span', null, r.prix == null ? 'à discuter' : fmt(r.prix)))),
@@ -668,7 +689,7 @@ function showTicket(t) {
         el('span', null, Number(t.total) === 0 && hasUnpriced ? 'À discuter' : fmt(t.total) + (hasUnpriced ? ' + à discuter' : ''))),
       payBlock,
       el('hr'),
-      el('p', { class: 'thanks' }, 'Merci ' + (t.nom || '').split(' ')[0] + ' ! Tes articles sont mis de côté. Guillaume confirme la réception du virement puis te contacte pour la remise.'),
+      el('p', { class: 'thanks' }, 'Merci ' + (t.nom || '').split(' ')[0] + ' ! Tes articles sont mis de côté. On confirme la réception du virement puis on te contacte pour la remise.'),
       t.infos_retrait ? el('p', { class: 'thanks' }, t.infos_retrait) : null,
       (t.unavailable || []).length
         ? el('p', { class: 'thanks' }, 'Pas de chance : ' + t.unavailable.map((u) => u.nom).join(', ') + ' venait d\'être pris.')
