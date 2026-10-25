@@ -273,6 +273,9 @@
   .receipt .pay-label { color: #6C6A60; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; margin-top: 12px; }
   .receipt .pay-val { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 700; font-size: 1rem; overflow-wrap: anywhere; }
   .receipt .code { font-size: 1.5rem; letter-spacing: .06em; }
+  .receipt .qr { display: grid; justify-items: center; gap: 6px; margin: 16px 0 2px; text-align: center; }
+  .receipt .qr img { width: 172px; height: 172px; image-rendering: pixelated; background: #fff; padding: 6px; border-radius: 8px; border: 1.5px solid #E1D5BF; }
+  .receipt .qr small { color: #6C6A60; font-size: .8rem; max-width: 30ch; }
   .copy { flex: none; background: #2E4538; color: #FFFDF7; border: 0; border-radius: 8px; padding: 8px 12px; font-family: var(--body); font-weight: 700; font-size: .8rem; min-height: 38px; }
   .receipt .thanks { text-align: center; margin: 14px 0 0; font-family: var(--body); font-size: .92rem; line-height: 1.4; }
 
@@ -288,6 +291,7 @@
     .merc:hover { transform: translateY(-2px); }
   }
 </style>
+<script src="qrcode.min.js" defer></script>
 </head>
 <body>
 
@@ -667,22 +671,43 @@ async function copy(text, label) {
   catch { toast('Copie impossible : sélectionne le texte à la main.'); }
 }
 
+// QR « virement SEPA » (standard EPC069-12) : lu par la plupart des apps bancaires.
+function epcQr(t, communication, amount) {
+  if (typeof qrcode !== 'function') return null;
+  const payload = ['BCD', '002', '1', 'SCT', '',
+    (t.beneficiaire || 'Guillaume').slice(0, 70),
+    t.iban.replace(/\s+/g, '').toUpperCase(),
+    amount > 0 ? 'EUR' + amount.toFixed(2) : '',
+    '', '', communication.slice(0, 140)].join('\n');
+  try {
+    qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+    const qr = qrcode(0, 'M');
+    qr.addData(payload, 'Byte');
+    qr.make();
+    return el('div', { class: 'qr' },
+      el('img', { src: qr.createDataURL(6, 0), alt: 'QR code de virement' }),
+      el('small', null, 'Scanne-le avec l\'app de ta banque : bénéficiaire, IBAN' + (amount > 0 ? ', montant' : '') + ' et communication se remplissent tout seuls.'));
+  } catch { return null; }
+}
+
 function showTicket(t) {
   const d = $('cabas');
   const date = new Date(t.date || Date.now());
+  const hasUnpriced = (t.reserved || []).some((r) => r.prix == null);
+  const communication = (t.code + ' ' + (t.nom || '')).trim();
   const payBlock = t.iban
     ? [
+        epcQr(t, communication, hasUnpriced ? 0 : Number(t.total)),
         el('div', { class: 'pay-label' }, 'Bénéficiaire'),
         el('div', { class: 'pay-val' }, el('span', null, t.beneficiaire || 'Guillaume')),
         el('div', { class: 'pay-label' }, 'IBAN'),
         el('div', { class: 'pay-val' }, el('span', null, formatIban(t.iban)),
           el('button', { class: 'copy', type: 'button', onclick: () => copy(t.iban.replace(/\s+/g, ''), 'IBAN') }, 'Copier')),
-        el('div', { class: 'pay-label' }, 'Communication (à recopier)'),
-        el('div', { class: 'pay-val' }, el('span', { class: 'code' }, t.code),
-          el('button', { class: 'copy', type: 'button', onclick: () => copy(t.code, 'Communication') }, 'Copier')),
+        el('div', { class: 'pay-label' }, 'Communication'),
+        el('div', { class: 'pay-val' }, el('span', null, communication),
+          el('button', { class: 'copy', type: 'button', onclick: () => copy(communication, 'Communication') }, 'Copier')),
       ]
-    : [el('p', { class: 'thanks' }, 'On t\'envoie nos coordonnées bancaires dans la foulée. Garde bien ce code : ' + t.code)];
-  const hasUnpriced = (t.reserved || []).some((r) => r.prix == null);
+    : [el('p', { class: 'thanks' }, 'On t\'envoie nos coordonnées bancaires dans la foulée.')];
   d.replaceChildren(el('div', { class: 'sheet' },
     sheetHead('Ton ticket', d),
     el('div', { class: 'receipt' },
