@@ -380,8 +380,34 @@ function itemRow(it) {
 }
 
 // ---------- photos ----------
+// Chrome et Firefox ne savent pas lire le HEIC des iPhone : décodeur libheif chargé seulement si besoin.
+const HEIC_LIB = 'https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js';
+let heicLib = null;
+function loadHeic() {
+  heicLib ??= new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = HEIC_LIB;
+    s.onload = () => resolve(window.HeicTo);
+    s.onerror = () => { heicLib = null; reject(new Error('heic_lib')); };
+    document.head.append(s);
+  });
+  return heicLib;
+}
+const isHeicFile = (f) => /\.(heic|heif)$/i.test(f.name) || /hei[cf]/i.test(f.type);
+
+async function decodeImage(file) {
+  try {
+    return await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch (err) {
+    if (!isHeicFile(file)) throw err;
+    toast('Conversion de la photo HEIC...');
+    const HeicTo = await loadHeic();
+    return HeicTo({ blob: file, type: 'bitmap' });
+  }
+}
+
 async function compress(file) {
-  const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+  const bmp = await decodeImage(file);
   const scale = Math.min(1, 1200 / Math.max(bmp.width, bmp.height));
   const c = document.createElement('canvas');
   c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
