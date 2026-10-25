@@ -338,7 +338,7 @@ function rerenderList() {
 }
 
 async function saveItem(item, patch) {
-  const body = { id: item.id, nom: item.nom, description: item.description, categorie: item.categorie, prix: item.prix, lien_externe: item.lien_externe, photos: item.photos, ...patch };
+  const body = { id: item.id, nom: item.nom, description: item.description, categorie: item.categorie, prix: item.prix, lien_externe: item.lien_externe, photos: item.photos, photos_illustration: !!item.photos_illustration, ...patch };
   const d = await api('/admin/items', { method: 'POST', body });
   const i = S.items.findIndex((x) => x.id === item.id);
   if (i >= 0) S.items[i] = d.item;
@@ -358,7 +358,15 @@ function itemRow(it) {
   const file = el('input', {
     type: 'file', accept: 'image/*', multiple: true, hidden: true,
     onchange: async (e) => {
-      try { const urls = await uploadFiles(e.target.files); if (urls.length) { await saveItem(it, { photos: [...(it.photos || []), ...urls].slice(0, 8) }); toast('Photo ajoutée'); render(); } }
+      try {
+        const urls = await uploadFiles(e.target.files);
+        if (urls.length) {
+          // une vraie photo remplace la photo d'illustration
+          const photos = it.photos_illustration ? urls.slice(0, 8) : [...(it.photos || []), ...urls].slice(0, 8);
+          await saveItem(it, { photos, photos_illustration: false });
+          toast(it.photos_illustration ? 'Photo d\'illustration remplacée' : 'Photo ajoutée'); render();
+        }
+      }
       catch (err) { if (!(err instanceof AuthError)) toast('Envoi de la photo impossible.'); }
     },
   });
@@ -366,7 +374,8 @@ function itemRow(it) {
     thumb,
     el('div', { class: 'item-main' },
       el('div', { class: 'item-name' }, it.nom),
-      el('div', { class: 'item-cat' }, it.categorie + ' · ', el('span', { class: 'status s-' + it.statut }, ITEM_LABEL[it.statut]))),
+      el('div', { class: 'item-cat' }, it.categorie + ' · ', el('span', { class: 'status s-' + it.statut }, ITEM_LABEL[it.statut]),
+        it.photos_illustration ? ' · photo d\'illustration' : null)),
     el('div', { class: 'item-controls' },
       price, el('span', { class: 'euro' }, '€'),
       el('button', { class: 'btn ghost small', type: 'button', onclick: () => file.click() }, 'Ajouter photo'), file,
@@ -424,7 +433,7 @@ function editItem(it) {
     onsubmit: async (e) => {
       e.preventDefault();
       const f = e.target;
-      const body = { id: it && it.id, nom: f.nom.value, categorie: f.categorie.value, prix: f.prix.value === '' ? null : f.prix.value, description: f.description.value, lien_externe: f.lien.value, photos: cur.photos };
+      const body = { id: it && it.id, nom: f.nom.value, categorie: f.categorie.value, prix: f.prix.value === '' ? null : f.prix.value, description: f.description.value, lien_externe: f.lien.value, photos: cur.photos, photos_illustration: f.illus.checked && cur.photos.length > 0 };
       if (!isNew && f.statut.value !== it.statut) body.statut = f.statut.value;
       try {
         const d = await api('/admin/items', { method: 'POST', body });
@@ -447,7 +456,10 @@ function editItem(it) {
     el('div', { class: 'row' }, el('label', { for: 'e-desc' }, 'Description (état, dimensions, âge...)'), el('textarea', { class: 'field', id: 'e-desc', name: 'description', maxlength: '2000' }, cur.description)),
     el('div', { class: 'row' }, el('label', { for: 'e-lien' }, 'Lien vers le produit d\'origine (facultatif)'), el('input', { class: 'field', id: 'e-lien', name: 'lien', type: 'url', value: cur.lien_externe || '', placeholder: 'https://' })),
     el('div', { class: 'row' }, el('label', null, 'Photos'), photosBox,
-      el('div', null, el('button', { class: 'btn ghost small', type: 'button', onclick: () => fileIn.click() }, 'Ajouter des photos'), fileIn)),
+      el('div', null, el('button', { class: 'btn ghost small', type: 'button', onclick: () => fileIn.click() }, 'Ajouter des photos'), fileIn),
+      el('label', { style: 'display:flex;gap:8px;align-items:center;font-weight:500' },
+        el('input', { type: 'checkbox', name: 'illus', checked: !!cur.photos_illustration }),
+        'Photos d\'illustration (modèle neuf, pas l\'objet lui-même)')),
     isNew ? el('input', { type: 'hidden', name: 'statut', value: 'dispo' })
       : el('div', { class: 'row' }, el('label', { for: 'e-statut' }, 'Statut (à forcer seulement en cas de correction)'),
           el('select', { class: 'field', id: 'e-statut', name: 'statut' }, Object.entries(ITEM_LABEL).map(([v, l]) => el('option', { value: v, selected: v === it.statut }, l)))),

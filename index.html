@@ -134,6 +134,14 @@
     color: var(--photo-ink); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase;
   }
   .photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .photo.packshot { background: #FFFFFF; }
+  .photo.packshot img { object-fit: contain; padding: 8%; }
+  .illus {
+    position: absolute; left: 8px; top: 8px; z-index: 1;
+    background: rgba(46, 69, 56, .82); color: #FDF9F1;
+    font-size: .64rem; font-weight: 700; letter-spacing: .04em; text-transform: none;
+    padding: 3px 7px; border-radius: 6px;
+  }
   .media { position: relative; }
   .tag {
     position: absolute; right: 10px; bottom: -14px;
@@ -412,9 +420,12 @@ function renderChips() {
 }
 
 function photoBlock(it) {
-  const photo = el('div', { class: 'photo' });
-  if (it.photos && it.photos[0]) photo.append(el('img', { src: it.photos[0], alt: '', loading: 'lazy', decoding: 'async' }));
-  else photo.append('Photo à venir');
+  const has = it.photos && it.photos[0];
+  const photo = el('div', { class: 'photo' + (has && it.photos_illustration ? ' packshot' : '') });
+  if (has) {
+    photo.append(el('img', { src: it.photos[0], alt: '', loading: 'lazy', decoding: 'async' }));
+    if (it.photos_illustration) photo.append(el('span', { class: 'illus' }, 'Photo d\'illustration'));
+  } else photo.append('Photo à venir');
   return photo;
 }
 
@@ -493,7 +504,7 @@ function drawDetail(photoIndex) {
   const photos = it.photos || [];
   const available = it.statut === 'dispo';
   const inCart = cart.has(it.id);
-  const main = el('div', { class: 'main-photo' }, photoBlock({ photos: photos[photoIndex] ? [photos[photoIndex]] : [] }));
+  const main = el('div', { class: 'main-photo' }, photoBlock({ photos: photos[photoIndex] ? [photos[photoIndex]] : [], photos_illustration: it.photos_illustration }));
   main.firstChild.style.height = '100%'; main.firstChild.style.aspectRatio = 'auto';
   const thumbs = photos.length > 1
     ? el('div', { class: 'thumbs' }, photos.map((p, i) =>
@@ -511,6 +522,7 @@ function drawDetail(photoIndex) {
     el('p', { class: 'detail-price' }, it.prix == null ? 'Prix à discuter' : fmt(it.prix)),
     el('p', { class: 'cat' }, it.categorie + (available ? '' : ' · ' + (it.statut === 'reserve' ? 'déjà réservé' : 'déjà vendu'))),
     it.description ? el('p', { class: 'detail-desc' }, it.description) : null,
+    it.photos_illustration && photos.length ? el('p', { class: 'note' }, 'La photo montre le modèle neuf. Demande à Guillaume si tu veux voir l\'objet lui-même.') : null,
     link,
     available
       ? el('div', { class: 'detail-actions' },
@@ -651,7 +663,8 @@ function showTicket(t) {
       el('hr'),
       (t.reserved || []).map((r) => el('div', { class: 'r-line' }, el('span', null, r.nom), el('span', null, r.prix == null ? 'à discuter' : fmt(r.prix)))),
       el('hr'),
-      el('div', { class: 'r-line r-total' }, el('span', null, 'À VIRER'), el('span', null, fmt(t.total) + (hasUnpriced ? ' + à discuter' : ''))),
+      el('div', { class: 'r-line r-total' }, el('span', null, 'À VIRER'),
+        el('span', null, Number(t.total) === 0 && hasUnpriced ? 'À discuter' : fmt(t.total) + (hasUnpriced ? ' + à discuter' : ''))),
       payBlock,
       el('hr'),
       el('p', { class: 'thanks' }, 'Merci ' + (t.nom || '').split(' ')[0] + ' ! Tes articles sont mis de côté. Guillaume confirme la réception du virement puis te contacte pour la remise.'),
